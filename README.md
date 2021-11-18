@@ -1,2 +1,2 @@
-# pyconcurrency
-Python Concurrency Demo
+# pyconcurrent
+Python Concurrent Application Demo
