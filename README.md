@@ -21,7 +21,7 @@ python3 -m venv venv && source venv/bin/activate && pip install -r requirements.
 Switch to the appropriate feature branch and run the application
 ```shell
 git checkout <feature branch name>
-python3 -m pyconcurrent.main
+python3 PYTHONPATH=./src -m pyconcurrent.main
 ```
 
 Available feature branches include:
