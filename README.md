@@ -11,7 +11,7 @@ Fetch each photo resource from [JSON Placeholder](https://jsonplaceholder.typico
 and record the results in a data structure.
 
 Note: This isn't a use case which would really benefit from multiprocessing. The multiprocessing implementation is included
-just to contrast appraches.
+just to contrast approaches.
 
 ## Getting Started
 
