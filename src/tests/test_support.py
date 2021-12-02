@@ -6,7 +6,7 @@ from pyconcurrent.support import Timer, create_id_lists
 
 def test_timer():
     with Timer() as t:
-        [i for i in range(5_000)]
+        [i for i in range(5000)]
 
     assert t.start > 0
     assert t.end > 0

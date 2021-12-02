@@ -115,7 +115,7 @@ if __name__ == "__main__":
 
     with Timer() as t:
         args = _parse_args()
-        logging.info("Starting pyconnect with the following options . . . ")
+        logging.info("Starting pyconcurrent with the following options . . . ")
         logging.info(f"workers = {args.workers}")
         logging.info(f"resourceid = {args.resourceid}")
         logging.info(f"url = {args.url}")

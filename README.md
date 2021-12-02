@@ -10,6 +10,9 @@ quite contrived use-case.
 Fetch each photo resource from [JSON Placeholder](https://jsonplaceholder.typicode.com/photos), a free to use "sample" api,
 and record the results in a data structure.
 
+Note: This isn't a use case which would really benefit from multiprocessing. The multiprocessing implementation is included
+just to contrast approaches.
+
 ## Getting Started
 
 Create a virtual environment and install dependencies
@@ -21,9 +24,10 @@ python3 -m venv venv && source venv/bin/activate && pip install -r requirements.
 Switch to the appropriate feature branch and run the application
 ```shell
 git checkout <feature branch name>
-python3 PYTHONPATH=./src -m pyconcurrent.main
+PYTHONPATH=./src python3 -m pyconcurrent.main
 ```
 
 Available feature branches include:
 
-* manual-threads
+* main - a single threaded approach
+* manual-threads - multiple threads
