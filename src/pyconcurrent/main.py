@@ -101,5 +101,7 @@ if __name__ == "__main__":
 
     logging.info("results ***********************")
     logging.info(f"elapsed time {t.elapsed_time}")
+    logging.info("*****status code count*****")
     for k, v in api_results.items():
         logging.info(f"response code {k} = {v}")
+    logging.info("*************************")
