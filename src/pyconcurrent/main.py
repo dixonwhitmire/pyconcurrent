@@ -7,11 +7,12 @@ Usage:
 (venv) user@mbp pyconcurrent % PYTHONPATH=./src python -m pyconcurrent.main --help
 """
 import argparse
-from threading import Thread, Lock
-from typing import List, Dict
+from concurrent.futures import ThreadPoolExecutor, Future
+from threading import Lock
+from typing import Dict, List
 from collections import defaultdict
 import requests
-from pyconcurrent.support import create_id_lists, Timer
+from pyconcurrent.support import Timer
 import logging
 
 logger = logging.getLogger(__name__)
@@ -73,16 +74,21 @@ def _parse_args():
     return parser.parse_args()
 
 
-def _submit_requests(url: str, resource_ids: List):
+def _submit_request(url: str) -> int:
     """
-    Submits GET requests to an API endpoint.
+    Submits a GET request to an endpoint, returning a HTTP response status code.
 
-    :param url: The base API resource url
-    :param resource_ids: The list of resource ids
+    :param url: The resource url
+    :return: The HTTP status return code
     """
-    for resource_id in resource_ids:
-        response = requests.get(f"{url}/{resource_id}")
-        api_results.add_result(response.status_code)
+    response = requests.get(url)
+    return response.status_code
+
+
+def _result_callback(future: Future):
+    """Records the API status code result"""
+    status_code: int = future.result()
+    api_results.add_result(status_code)
 
 
 def _run(worker_count: int, max_resource_id: int, base_url: str):
@@ -93,22 +99,14 @@ def _run(worker_count: int, max_resource_id: int, base_url: str):
     :param max_resource_id: The maximum resource id
     :param base_url: The base URL used to fetch resources
     """
-    work_lists = create_id_lists(max_resource_id, worker_count)
-    threads: List[Thread] = []
+    resource_ids = list(range(1, max_resource_id + 1))
+    future_results: List[Future] = []
 
-    for i, wl in enumerate(work_lists):
-        t = Thread(
-            name=f"pyconcurrent-thread-{i}",
-            target=_submit_requests,
-            args=(base_url, wl),
-        )
-        t.start()
-        logging.info(f"starting thread {t.name}")
-        threads.append(t)
-
-    for t in threads:
-        logging.info(f"joining thread {t.name}")
-        t.join()
+    with ThreadPoolExecutor(max_workers=worker_count) as e:
+        for resource_id in resource_ids:
+            future = e.submit(_submit_request, f"{base_url}/{resource_id}")
+            future.add_done_callback(_result_callback)
+            future_results.append(future)
 
 
 if __name__ == "__main__":
@@ -124,5 +122,7 @@ if __name__ == "__main__":
 
     logging.info("results ***********************")
     logging.info(f"elapsed time {t.elapsed_time}")
+    logging.info("*****status code count*****")
     for k, v in api_results.items():
         logging.info(f"response code {k} = {v}")
+    logging.info("*************************")
