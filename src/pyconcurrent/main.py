@@ -7,9 +7,9 @@ Usage:
 (venv) user@mbp pyconcurrent % PYTHONPATH=./src python -m pyconcurrent.main --help
 """
 import argparse
-from concurrent.futures import ThreadPoolExecutor, Future
+from concurrent.futures import ProcessPoolExecutor, Future
 from threading import Lock
-from typing import Dict, List
+from typing import Dict
 from collections import defaultdict
 import requests
 from pyconcurrent.support import Timer
@@ -105,7 +105,7 @@ def _run(worker_count: int, max_resource_id: int, base_url: str):
     """
     resource_ids = list(range(1, max_resource_id + 1))
 
-    with ThreadPoolExecutor(max_workers=worker_count) as e:
+    with ProcessPoolExecutor(max_workers=worker_count) as e:
         for resource_id in resource_ids:
             future = e.submit(_submit_request, f"{base_url}/{resource_id}")
             future.add_done_callback(_result_callback)
