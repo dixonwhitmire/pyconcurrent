@@ -87,8 +87,12 @@ def _submit_request(url: str) -> int:
 
 def _result_callback(future: Future):
     """Records the API status code result"""
-    status_code: int = future.result()
-    api_results.add_result(status_code)
+    try:
+        status_code: int = future.result()
+    except Exception as ex:
+        logging.exception(ex)
+    else:
+        api_results.add_result(status_code)
 
 
 def _run(worker_count: int, max_resource_id: int, base_url: str):
@@ -100,13 +104,11 @@ def _run(worker_count: int, max_resource_id: int, base_url: str):
     :param base_url: The base URL used to fetch resources
     """
     resource_ids = list(range(1, max_resource_id + 1))
-    future_results: List[Future] = []
 
     with ThreadPoolExecutor(max_workers=worker_count) as e:
         for resource_id in resource_ids:
             future = e.submit(_submit_request, f"{base_url}/{resource_id}")
             future.add_done_callback(_result_callback)
-            future_results.append(future)
 
 
 if __name__ == "__main__":
